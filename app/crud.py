@@ -80,6 +80,11 @@ def create_note(
     new_note = models.Note(
         title=note_data.title,
         content=note_data.content,
+
+        completed=note_data.completed,
+        due_date=note_data.due_date,
+        tags=note_data.tags,
+
         owner_id=owner_id,
     )
 

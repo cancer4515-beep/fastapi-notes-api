@@ -1,4 +1,13 @@
-from sqlalchemy import Boolean, ForeignKey, String, Text
+from datetime import datetime
+
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    ForeignKey,
+    JSON,
+    String,
+    Text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -51,6 +60,23 @@ class Note(Base):
 
     content: Mapped[str] = mapped_column(
         Text,
+        nullable=False,
+    )
+
+    completed: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        nullable=False,
+    )
+
+    due_date: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
+    tags: Mapped[list[str]] = mapped_column(
+        JSON,
+        default=list,
         nullable=False,
     )
 

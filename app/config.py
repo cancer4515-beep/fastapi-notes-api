@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     secret_key: str = Field(min_length=32)
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
-    database_url: str = "sqlite:///./day48.db"
+    database_url: str = "sqlite:///./day51.db"
 
     cors_origins: list[str] = [
         "http://127.0.0.1:5500",

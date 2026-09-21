@@ -5,9 +5,32 @@ from app.config import settings
 from app.routers import auth, notes
 
 
+openapi_tags = [
+    {
+        "name": "System",
+        "description": "Kiểm tra trạng thái API.",
+    },
+    {
+        "name": "Auth",
+        "description": (
+            "Đăng ký, đăng nhập và "
+            "thông tin người dùng hiện tại."
+        ),
+    },
+    {
+        "name": "Notes",
+        "description": (
+            "CRUD notes của người dùng. "
+            "Yêu cầu JWT authentication."
+        ),
+    },
+]
+
+
 app = FastAPI(
-    title="Day 48 - CORS and Environment Config",
-    version="1.0.0",
+    title="FastAPI Notes API",
+    version="1.1.0",
+    openapi_tags=openapi_tags,
 )
 
 
@@ -33,10 +56,10 @@ app.include_router(auth.router)
 app.include_router(notes.router)
 
 
-@app.get("/")
+@app.get("/", tags=["System"])
 def root():
     return {
-        "message": "Day 48 API is running",
+        "message": "FastAPI Notes API is running",
     }
 
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -59,13 +60,34 @@ class NoteCreate(BaseModel):
         min_length=1,
         max_length=200,
     )
-    content: str = Field(min_length=1)
 
-    model_config = ConfigDict(extra="forbid")
+    content: str = Field(
+        min_length=1
+    )
 
-    @field_validator("title", "content")
+    completed: bool = False
+
+    due_date: datetime | None = None
+
+    tags: list[str] = Field(
+        default_factory=list,
+        max_length=10,
+    )
+
+    model_config = ConfigDict(
+        extra="forbid"
+    )
+
+    @field_validator(
+        "title",
+        "content",
+    )
     @classmethod
-    def fields_not_blank(cls, value: str) -> str:
+    def fields_not_blank(
+        cls,
+        value: str,
+    ) -> str:
+
         cleaned_value = value.strip()
 
         if not cleaned_value:
@@ -74,7 +96,31 @@ class NoteCreate(BaseModel):
             )
 
         return cleaned_value
+@field_validator("tags")
+@classmethod
+def normalize_tags(
+    cls,
+    values: list[str],
+) -> list[str]:
 
+    cleaned_tags = []
+
+    for value in values:
+
+        tag = value.strip().lower()
+
+        if not tag:
+            continue
+
+        if len(tag) > 30:
+            raise ValueError(
+                "Mỗi tag tối đa 30 ký tự"
+            )
+
+        if tag not in cleaned_tags:
+            cleaned_tags.append(tag)
+
+    return cleaned_tags
 
 class NoteUpdate(BaseModel):
     title: str | None = Field(
@@ -82,12 +128,24 @@ class NoteUpdate(BaseModel):
         min_length=1,
         max_length=200,
     )
+
     content: str | None = Field(
         default=None,
         min_length=1,
     )
 
-    model_config = ConfigDict(extra="forbid")
+    completed: bool | None = None
+
+    due_date: datetime | None = None
+
+    tags: list[str] | None = Field(
+        default=None,
+        max_length=10,
+    )
+
+    model_config = ConfigDict(
+        extra="forbid"
+    )
 
     @field_validator("title", "content")
     @classmethod
@@ -112,6 +170,13 @@ class NoteResponse(BaseModel):
     id: int
     title: str
     content: str
+
+    completed: bool
+    due_date: datetime | None
+    tags: list[str]
+
     owner_id: int
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True
+    )

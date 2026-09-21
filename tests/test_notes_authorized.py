@@ -208,3 +208,124 @@ def test_user_cannot_access_another_users_note(
     )
 
     assert owner_response.status_code == 200
+def test_create_note_with_day51_fields(
+    client: TestClient,
+) -> None:
+
+    headers = register_and_login(client)
+
+    response = client.post(
+        "/notes/",
+        headers=headers,
+        json={
+            "title": "Học Day 51",
+            "content": "Test field mới",
+            "completed": False,
+            "due_date": "2026-09-25T20:00:00",
+            "tags": [
+                "python",
+                "fastapi",
+            ],
+        },
+    )
+
+    assert response.status_code == 201
+
+    note = response.json()
+
+    assert note["completed"] is False
+
+    assert note["tags"] == [
+        "python",
+        "fastapi",
+    ]
+
+    assert note["due_date"] is not None
+def test_mark_note_completed(
+    client: TestClient,
+) -> None:
+
+    headers = register_and_login(client)
+
+    note = create_note(
+        client,
+        headers,
+    )
+
+    response = client.put(
+        f"/notes/{note['id']}",
+        headers=headers,
+        json={
+            "completed": True,
+        },
+    )
+
+    assert response.status_code == 200
+
+    assert (
+        response.json()["completed"]
+        is True
+    )
+def test_create_note_with_day51_fields(
+    client: TestClient,
+) -> None:
+    headers = register_and_login(client)
+
+    response = client.post(
+        "/notes/",
+        headers=headers,
+        json={
+            "title": "Học Day 51",
+            "content": "Test các field mới",
+            "completed": False,
+            "due_date": "2026-09-25T20:00:00",
+            "tags": [
+                "python",
+                "fastapi",
+            ],
+        },
+    )
+
+    assert response.status_code == 201
+
+    note = response.json()
+
+    assert note["title"] == "Học Day 51"
+    assert note["completed"] is False
+    assert note["due_date"] is not None
+    assert note["tags"] == [
+        "python",
+        "fastapi",
+    ]
+def test_remove_note_due_date(
+    client: TestClient,
+) -> None:
+    headers = register_and_login(client)
+
+    response = client.post(
+        "/notes/",
+        headers=headers,
+        json={
+            "title": "Note có deadline",
+            "content": "Test due date",
+            "due_date": "2026-09-25T20:00:00",
+        },
+    )
+
+    assert response.status_code == 201
+
+    note = response.json()
+
+    update_response = client.put(
+        f"/notes/{note['id']}",
+        headers=headers,
+        json={
+            "due_date": None,
+        },
+    )
+
+    assert update_response.status_code == 200
+
+    updated_note = update_response.json()
+
+    assert updated_note["due_date"] is None
