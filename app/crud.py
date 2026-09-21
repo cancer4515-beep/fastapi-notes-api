@@ -98,16 +98,30 @@ def create_note(
 def get_notes_by_owner(
     db: Session,
     owner_id: int,
+    skip: int = 0,
+    limit: int = 10,
+    search: str | None = None,
 ) -> list[models.Note]:
-    statement = (
-        select(models.Note)
-        .where(models.Note.owner_id == owner_id)
-        .order_by(models.Note.id)
+
+    statement = select(models.Note).where(
+        models.Note.owner_id == owner_id
     )
 
-    return list(db.scalars(statement).all())
+    if search:
+        statement = statement.where(
+            models.Note.title.contains(search)
+        )
 
+    statement = (
+        statement
+        .order_by(models.Note.id)
+        .offset(skip)
+        .limit(limit)
+    )
 
+    return list(
+        db.scalars(statement).all()
+    )
 def get_note_by_id_and_owner(
     db: Session,
     note_id: int,
