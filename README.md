@@ -30,3 +30,21 @@ REST API quản lý notes sử dụng FastAPI.
 
 ```bash
 python -m venv .venv
+Setup
+Run server
+Environment variables
+Run tests
+Seed data
+
+Endpoints:
+POST   /auth/register
+POST   /auth/login
+GET    /auth/me
+
+POST   /notes/
+GET    /notes/
+GET    /notes/{id}
+PUT    /notes/{id}
+DELETE /notes/{id}
+
+GET    /health  

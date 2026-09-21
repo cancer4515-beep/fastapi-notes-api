@@ -266,37 +266,6 @@ def test_mark_note_completed(
         response.json()["completed"]
         is True
     )
-def test_create_note_with_day51_fields(
-    client: TestClient,
-) -> None:
-    headers = register_and_login(client)
-
-    response = client.post(
-        "/notes/",
-        headers=headers,
-        json={
-            "title": "Học Day 51",
-            "content": "Test các field mới",
-            "completed": False,
-            "due_date": "2026-09-25T20:00:00",
-            "tags": [
-                "python",
-                "fastapi",
-            ],
-        },
-    )
-
-    assert response.status_code == 201
-
-    note = response.json()
-
-    assert note["title"] == "Học Day 51"
-    assert note["completed"] is False
-    assert note["due_date"] is not None
-    assert note["tags"] == [
-        "python",
-        "fastapi",
-    ]
 def test_remove_note_due_date(
     client: TestClient,
 ) -> None:
@@ -329,3 +298,30 @@ def test_remove_note_due_date(
     updated_note = update_response.json()
 
     assert updated_note["due_date"] is None
+def test_normalize_note_tags(
+    client: TestClient,
+) -> None:
+    headers = register_and_login(client)
+
+    response = client.post(
+        "/notes/",
+        headers=headers,
+        json={
+            "title": "Test tags",
+            "content": "Kiểm tra normalize tags",
+            "tags": [
+                " Python ",
+                "FASTAPI",
+                "python",
+                " API ",
+            ],
+        },
+    )
+
+    assert response.status_code == 201
+
+    assert response.json()["tags"] == [
+        "python",
+        "fastapi",
+        "api",
+    ]

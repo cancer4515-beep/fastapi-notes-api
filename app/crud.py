@@ -147,9 +147,7 @@ def update_note(
 ) -> models.Note:
     update_data = note_data.model_dump(
         exclude_unset=True,
-        exclude_none=True,
     )
-
     for field, value in update_data.items():
         setattr(note, field, value)
 
