@@ -325,3 +325,33 @@ def test_normalize_note_tags(
         "fastapi",
         "api",
     ]
+def test_update_normalizes_tags(
+    client: TestClient,
+) -> None:
+    headers = register_and_login(client)
+
+    note = create_note(
+        client,
+        headers,
+    )
+
+    response = client.put(
+        f"/notes/{note['id']}",
+        headers=headers,
+        json={
+            "tags": [
+                " Python ",
+                "FASTAPI",
+                "python",
+                " Backend ",
+            ],
+        },
+    )
+
+    assert response.status_code == 200
+
+    assert response.json()["tags"] == [
+        "python",
+        "fastapi",
+        "backend",
+    ]

@@ -132,7 +132,6 @@ class NoteUpdate(BaseModel):
     )
 
     completed: bool | None = None
-
     due_date: datetime | None = None
 
     tags: list[str] | None = Field(
@@ -162,7 +161,32 @@ class NoteUpdate(BaseModel):
 
         return cleaned_value
 
+    @field_validator("tags")
+    @classmethod
+    def normalize_tags(
+        cls,
+        values: list[str] | None,
+    ) -> list[str] | None:
+        if values is None:
+            return None
 
+        cleaned_tags = []
+
+        for value in values:
+            tag = value.strip().lower()
+
+            if not tag:
+                continue
+
+            if len(tag) > 30:
+                raise ValueError(
+                    "Mỗi tag tối đa 30 ký tự"
+                )
+
+            if tag not in cleaned_tags:
+                cleaned_tags.append(tag)
+
+        return cleaned_tags
 class NoteResponse(BaseModel):
     id: int
     title: str
