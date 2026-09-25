@@ -1,0 +1,33 @@
+services:
+  api:
+    build: .
+    container_name: fastapi-notes-container
+
+    env_file:
+      - .env
+
+    environment:
+      DATABASE_URL: sqlite:////data/day51.db
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - fastapi-notes-data:/data
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  fastapi-notes-data:
+    name: fastapi-notes-data
