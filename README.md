@@ -415,3 +415,227 @@ Seed Data
 Automated Tests
 OpenAPI Documentation
 ```
+## Docker
+
+Project hỗ trợ chạy bằng Docker và Docker Compose.
+
+### Build và chạy project
+
+Chạy:
+
+```bash
+docker compose up -d --build
+```
+
+Lệnh này sẽ:
+
+- Build Docker image từ `Dockerfile`
+- Tạo container FastAPI
+- Mở port `8000`
+- Đọc biến môi trường từ `.env`
+- Gắn Docker Volume để lưu database
+- Khởi động API
+
+### Kiểm tra container
+
+```bash
+docker compose ps
+```
+
+Nếu hoạt động đúng, trạng thái container sẽ gần giống:
+
+```text
+Up ... (healthy)
+```
+
+### Tạo database trong container
+
+Lần đầu chạy project bằng Docker:
+
+```bash
+docker compose exec api python create_db.py
+```
+
+### Seed dữ liệu mẫu
+
+```bash
+docker compose exec api python seed.py
+```
+
+Tài khoản demo:
+
+```text
+username: demo
+password: matkhau123
+```
+
+### Mở API
+
+API:
+
+```text
+http://127.0.0.1:8000
+```
+
+Swagger UI:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+Health check:
+
+```text
+http://127.0.0.1:8000/health
+```
+
+### Xem logs
+
+```bash
+docker compose logs api
+```
+
+Xem logs liên tục:
+
+```bash
+docker compose logs -f api
+```
+
+Nhấn:
+
+```text
+Ctrl + C
+```
+
+để thoát khỏi chế độ xem logs.
+
+### Chạy test trong Docker
+
+```bash
+docker compose exec api python -m pytest
+```
+
+### Chạy lệnh bên trong container
+
+Ví dụ kiểm tra phiên bản Python:
+
+```bash
+docker compose exec api python --version
+```
+
+Xem file bên trong container:
+
+```bash
+docker compose exec api ls
+```
+
+### Dừng project
+
+```bash
+docker compose down
+```
+
+Lệnh này dừng và xóa container nhưng vẫn giữ Docker Volume.
+
+Database vẫn được giữ lại.
+
+### Chạy lại project
+
+```bash
+docker compose up -d
+```
+
+Database cũ vẫn còn nhờ Docker Volume.
+
+### Docker Volume
+
+Project sử dụng volume:
+
+```text
+fastapi-notes-data
+```
+
+Database SQLite được lưu tại:
+
+```text
+/data/day51.db
+```
+
+bên trong container.
+
+Volume giúp dữ liệu không bị mất khi container bị xóa và tạo lại.
+
+Kiểm tra volume:
+
+```bash
+docker volume ls
+```
+
+> Không dùng `docker compose down -v` nếu muốn giữ lại database.
+
+### Docker Files
+
+Project sử dụng:
+
+```text
+Dockerfile
+.dockerignore
+compose.yaml
+```
+
+`Dockerfile` dùng để build Docker image.
+
+`.dockerignore` loại bỏ các file không cần thiết khỏi image như:
+
+```text
+.venv
+.env
+*.db
+.git
+__pycache__
+```
+
+`compose.yaml` cấu hình:
+
+```text
+FastAPI container
+Port 8000
+Environment variables
+Docker Volume
+Healthcheck
+```
+
+### Docker workflow
+
+```text
+Dockerfile
+    ↓
+Docker Image
+    ↓
+Docker Container
+    ↓
+FastAPI
+    ↓
+Docker Volume
+    ↓
+SQLite Database
+```
+
+## Day 52 - Docker
+
+Nội dung đã hoàn thành:
+
+```text
+Docker installation
+Dockerfile
+Docker Image
+Docker Container
+Docker Volume
+Docker Compose
+Environment variables
+Healthcheck
+Logs
+Docker exec
+Pytest inside Docker
+Persistent SQLite database
+```
